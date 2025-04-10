@@ -1,0 +1,329 @@
+h     <td><button class="secondary remove-row">Remove</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" id="add-bs-row">+ Backsight</button>
+                    <button class="secondary" id="add-is-row">+ Intermediate</button>
+                    <button class="secondary" id="add-fs-row">+ Foresight</button>
+                </div>
+                
+                <button id="calculate-leveling">Calculate Elevations</button>
+                
+                <div id="leveling-results" class="result">
+                    <h3>Elevation Results:</h3>
+                    <div id="elevation-results"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Object Measurement Tab -->
+        <div id="object" class="tab-content">
+            <div class="card">
+                <h2>Object Measurement</h2>
+                <p>Calculate object dimensions using coins as reference scale.</p>
+                
+                <div class="input-group">
+                    <label for="coin-size">Reference Coin Size:</label>
+                    <select id="coin-size">
+                        <option value="24.26">US Quarter (24.26mm)</option>
+                        <option value="21.21">US Nickel (21.21mm)</option>
+                        <option value="19.05">US Penny (19.05mm)</option>
+                        <option value="17.91">US Dime (17.91mm)</option>
+                        <option value="26.5">Euro 2€ (26.5mm)</option>
+                        <option value="23.25">Euro 1€ (23.25mm)</option>
+                        <option value="25.0">Canadian $1 (25.0mm)</option>
+                        <option value="24.5">UK £1 (24.5mm)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="object-width">Object Width (in coin units):</label>
+                    <input type="number" id="object-width" placeholder="How many coins wide?" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="object-height">Object Height (in coin units):</label>
+                    <input type="number" id="object-height" placeholder="How many coins tall? (optional)" step="0.1">
+                </div>
+                
+                <button id="calculate-object">Calculate Dimensions</button>
+                
+                <div id="object-results" class="result">
+                    <h3>Object Dimensions:</h3>
+                    <div id="dimension-results"></div>
+                </div>
+                
+                <div class="note">
+                    <p><strong>How to use:</strong> Place a coin next to the object you want to measure. Visually estimate how many coins would fit across the width and height of the object.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- About Tab -->
+        <div id="about" class="tab-content">
+            <div class="card">
+                <h2>About Land Survey Pro</h2>
+                <p>Land Survey Pro is a comprehensive surveying tool designed for professionals and enthusiasts.</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li><strong>Leveling Calculator:</strong> Calculate elevations from leveling readings</li>
+                    <li><strong>Object Measurement:</strong> Measure objects using reference coins</li>
+                </ul>
+                
+                <h3>Reference Coin Sizes</h3>
+                <table>
+                    <tr>
+                        <th>Coin</th>
+                        <th>Diameter (mm)</th>
+                    </tr>
+                    <tr>
+                        <td>US Quarter</td>
+                        <td>24.26</td>
+                    </tr>
+                    <tr>
+                        <td>US Nickel</td>
+                        <td>21.21</td>
+                    </tr>
+                    <tr>
+                        <td>US Penny</td>
+                        <td>19.05</td>
+                    </tr>
+                    <tr>
+                        <td>US Dime</td>
+                        <td>17.91</td>
+                    </tr>
+                    <tr>
+                        <td>Euro 2€</td>
+                        <td>26.5</td>
+                    </tr>
+                    <tr>
+                        <td>Euro 1€</td>
+                        <td>23.25</td>
+                    </tr>
+                    <tr>
+                        <td>Canadian $1</td>
+                        <td>25.0</td>
+                    </tr>
+                    <tr>
+                        <td>UK £1</td>
+                        <td>24.5</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // Leveling Calculator
+        const benchmarkInput = document.getElementById('benchmark');
+        const levelingTable = document.getElementById('leveling-table').getElementsByTagName('tbody')[0];
+        const addBsRowBtn = document.getElementById('add-bs-row');
+        const addIsRowBtn = document.getElementById('add-is-row');
+        const addFsRowBtn = document.getElementById('add-fs-row');
+        const calculateLevelingBtn = document.getElementById('calculate-leveling');
+        const levelingResults = document.getElementById('leveling-results');
+        const elevationResults = document.getElementById('elevation-results');
+        
+        // Add row buttons
+        addBsRowBtn.addEventListener('click', function() {
+            const newRow = levelingTable.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="BS${levelingTable.rows.length}"></td>
+                <td><input type="number" step="0.001" placeholder="1.500" class="bs-reading"></td>
+                <td>-</td>
+                <td>-</td>
+                <td><button class="secondary remove-row">Remove</button></td>
+            `;
+            setupRemoveButtons();
+        });
+        
+        addIsRowBtn.addEventListener('click', function() {
+            const newRow = levelingTable.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="IS${levelingTable.rows.length}"></td>
+                <td>-</td>
+                <td><input type="number" step="0.001" placeholder="1.250" class="is-reading"></td>
+                <td>-</td>
+                <td><button class="secondary remove-row">Remove</button></td>
+            `;
+            setupRemoveButtons();
+        });
+        
+        addFsRowBtn.addEventListener('click', function() {
+            const newRow = levelingTable.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="FS${levelingTable.rows.length}"></td>
+                <td>-</td>
+                <td>-</td>
+                <td><input type="number" step="0.001" placeholder="0.875" class="fs-reading"></td>
+                <td><button class="secondary remove-row">Remove</button></td>
+            `;
+            setupRemoveButtons();
+        });
+        
+        function setupRemoveButtons() {
+            document.querySelectorAll('.remove-row').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (levelingTable.rows.length > 1) {
+                        this.closest('tr').remove();
+                    }
+                });
+            });
+        }
+        
+        setupRemoveButtons();
+        
+        // Calculate leveling
+        calculateLevelingBtn.addEventListener('click', function() {
+            const benchmark = parseFloat(benchmarkInput.value) || 100.0;
+            
+            // Get all station names and readings
+            const stations = [];
+            const readings = [];
+            
+            Array.from(levelingTable.rows).forEach(row => {
+                const stationInput = row.querySelector('td:first-child input');
+                const bsInput = row.querySelector('.bs-reading');
+                const isInput = row.querySelector('.is-reading');
+                const fsInput = row.querySelector('.fs-reading');
+                
+                if (stationInput && stationInput.value) {
+                    const station = {
+                        name: stationInput.value,
+                        bs: bsInput && bsInput.value ? parseFloat(bsInput.value) : null,
+                        is: isInput && isInput.value ? parseFloat(isInput.value) : null,
+                        fs: fsInput && fsInput.value ? parseFloat(fsInput.value) : null
+                    };
+                    
+                    if (station.bs !== null || station.is !== null || station.fs !== null) {
+                        stations.push(station);
+                    }
+                }
+            });
+            
+            if (stations.length === 0) {
+                alert('Please enter at least one station with readings');
+                return;
+            }
+            
+            // Calculate elevations
+            let currentHI = null;
+            let errors = [];
+            
+            stations.forEach(station => {
+                // Calculate Height of Instrument if we have a BS reading and known elevation
+                if (station.bs !== null) {
+                    if (station.name === 'BM') {
+                        station.elevation = benchmark;
+                        currentHI = benchmark + station.bs;
+                    } else if (currentHI !== null) {
+                        station.elevation = currentHI - (station.fs || 0);
+                        currentHI = station.elevation + station.bs;
+                    } else {
+                        errors.push(`Cannot calculate elevation for ${station.name}: no previous HI`);
+                    }
+                } 
+                // Calculate elevation for FS or IS points
+                else if ((station.fs !== null || station.is !== null) && currentHI !== null) {
+                    station.elevation = currentHI - (station.fs !== null ? station.fs : station.is);
+                } else {
+                    errors.push(`Cannot calculate elevation for ${station.name}: no HI established`);
+                }
+                
+                if (currentHI !== null) {
+                    station.hi = currentHI;
+                }
+            });
+            
+            if (errors.length > 0) {
+                alert('Errors encountered:\n' + errors.join('\n'));
+                return;
+            }
+            
+            // Display results
+            let resultHTML = '<table>';
+            resultHTML += '<thead><tr><th>Station</th><th>BS (m)</th><th>HI (m)</th><th>FS/IS (m)</th><th>Elevation (m)</th></tr></thead>';
+            resultHTML += '<tbody>';
+            
+            stations.forEach(station => {
+                resultHTML += `<tr>
+                    <td>${station.name}</td>
+                    <td>${station.bs !== null ? station.bs.toFixed(3) : '-'}</td>
+                    <td>${station.hi !== undefined ? station.hi.toFixed(3) : '-'}</td>
+                    <td>${station.fs !== null ? station.fs.toFixed(3) : (station.is !== null ? station.is.toFixed(3) : '-')}</td>
+                    <td>${station.elevation !== undefined ? station.elevation.toFixed(3) : '-'}</td>
+                </tr>`;
+            });
+            
+            resultHTML += '</tbody></table>';
+            
+            // Add summary
+            if (stations.length > 1) {
+                const firstElevation = stations[0].elevation;
+                const lastElevation = stations[stations.length - 1].elevation;
+                
+                if (firstElevation !== undefined && lastElevation !== undefined) {
+                    const difference = lastElevation - firstElevation;
+                    resultHTML += `<p><strong>Total Rise/Fall:</strong> ${difference.toFixed(3)} m</p>`;
+                }
+            }
+            
+            elevationResults.innerHTML = resultHTML;
+            levelingResults.style.display = 'block';
+        });
+        
+        // Object Measurement
+        const coinSizeSelect = document.getElementById('coin-size');
+        const objectWidthInput = document.getElementById('object-width');
+        const objectHeightInput = document.getElementById('object-height');
+        const calculateObjectBtn = document.getElementById('calculate-object');
+        const objectResults = document.getElementById('object-results');
+        const dimensionResults = document.getElementById('dimension-results');
+        
+        calculateObjectBtn.addEventListener('click', function() {
+            const coinSize = parseFloat(coinSizeSelect.value);
+            const width = parseFloat(objectWidthInput.value);
+            const height = objectHeightInput.value ? parseFloat(objectHeightInput.value) : null;
+            
+            if (isNaN(width)) {
+                alert('Please enter a valid width in coin units');
+                return;
+            }
+            
+            const widthMm = coinSize * width;
+            const widthCm = widthMm / 10;
+            
+            let resultHTML = `<p><strong>Width:</strong> ${widthMm.toFixed(2)} mm (${widthCm.toFixed(2)} cm)</p>`;
+            
+            if (height !== null && !isNaN(height)) {
+                const heightMm = coinSize * height;
+                const heightCm = heightMm / 10;
+                const areaCm2 = widthCm * heightCm;
+                
+                resultHTML += `<p><strong>Height:</strong> ${heightMm.toFixed(2)} mm (${heightCm.toFixed(2)} cm)</p>`;
+                resultHTML += `<p><strong>Area:</strong> ${areaCm2.toFixed(2)} cm²</p>`;
+            }
+            
+            dimensionResults.innerHTML = resultHTML;
+            objectResults.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
